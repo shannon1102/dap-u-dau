@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hammer and Ball</title>
+<style>
+    canvas {
+        border: 1px solid black;
+        display: block;
+        margin: auto;
+    }
+</style>
+</head>
+<body>
+<canvas id="myCanvas"></canvas>
+
+<script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+    // Adjust canvas size based on screen size
+    canvas.width = window.innerWidth * 0.8; // 80% of the window width
+    canvas.height = window.innerHeight * 0.6; // 60% of the window height
+
+    // Ball image
+    var ballImg = new Image();
+    ballImg.src = './ngoc.png'; // Replace 'ball_image.png' with your ball image path
+
+    // Hammer image
+    var hammerImg = new Image();
+    hammerImg.src = 'ngoc.png'; // Replace 'hammer_image.png' with your hammer image path
+
+    // Ball object
+    var ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: canvas.width < canvas.height ? 20 : 40, // Adjust ball size based on screen orientation
+        height: canvas.width < canvas.height ? 20 : 40,
+        dx: getRandomSpeed(),
+        dy: getRandomSpeed()
+    };
+
+    // Hammer object
+    var hammer = {
+        x: 0,
+        y: 0,
+        width: 60, // Adjust hammer size as needed
+        height: 60,
+    };
+
+    // Adjust ball speed based on screen size
+    function getRandomSpeed() {
+        var speed = (Math.random() - 0.5) * 4; // Default speed range
+        if (canvas.width < 500) {
+            speed *= 0.5; // Reduce speed for smaller screens
+        }
+        return speed;
+    }
+
+    function drawBall() {
+        ctx.drawImage(ballImg, ball.x - ball.width / 2, ball.y - ball.height / 2, ball.width, ball.height);
+    }
+
+    function drawHammer() {
+        ctx.drawImage(hammerImg, hammer.x - hammer.width / 2, hammer.y - hammer.height / 2, hammer.width, hammer.height);
+    }
+
+    function updateBallPosition() {
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        if (ball.x + ball.width / 2 > canvas.width || ball.x - ball.width / 2 < 0) {
+            ball.dx = -ball.dx;
+        }
+        if (ball.y + ball.height / 2 > canvas.height || ball.y - ball.height / 2 < 0) {
+            ball.dy = -ball.dy;
+        }
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function draw() {
+        clearCanvas();
+        drawBall();
+        if (isMouseInsideCanvas()) {
+            drawHammer();
+        }
+        updateBallPosition();
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    // Update canvas size on window resize
+    window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth * 0.8;
+        canvas.height = window.innerHeight * 0.6;
+        ball.width = canvas.width < canvas.height ? 20 : 40;
+        ball.height = canvas.width < canvas.height ? 20 : 40;
+        ball.dx = getRandomSpeed();
+        ball.dy = getRandomSpeed();
+    });
+
+    // Track mouse movements inside the canvas
+    canvas.addEventListener('mousemove', function(event) {
+        hammer.x = event.clientX - canvas.getBoundingClientRect().left;
+        hammer.y = event.clientY - canvas.getBoundingClientRect().top;
+    });
+
+    // Check if the mouse is inside the canvas
+    function isMouseInsideCanvas() {
+        return hammer.x >= 0 && hammer.x <= canvas.width && hammer.y >= 0 && hammer.y <= canvas.height;
+    }
+</script>
+</body>
+</html>
